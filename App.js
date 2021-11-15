@@ -1,8 +1,34 @@
 import { StatusBar } from "expo-status-bar";
-import React, { useState, useEffect } from "react";
-import { StyleSheet, Text, View, Button } from "react-native";
+import React, { useRef, useState, useEffect } from "react";
+import { AppState, StyleSheet, Text, View, Button } from "react-native";
+import { useKeepAwake } from "expo-keep-awake";
 
 export default function App() {
+  useKeepAwake();
+  const appState = useRef(AppState.currentState);
+  const [appStateVisible, setAppStateVisible] = useState(appState.current);
+
+  useEffect(() => {
+    AppState.addEventListener("change", _handleAppStateChange);
+
+    return () => {
+      AppState.removeEventListener("change", _handleAppStateChange);
+    };
+  }, []);
+
+  const _handleAppStateChange = (nextAppState) => {
+    if (
+      (appState.current == "active" && nextAppState === "inactive") ||
+      "background"
+    ) {
+      stopCounter();
+    }
+
+    appState.current = nextAppState;
+    setAppStateVisible(appState.current);
+    //console.log("AppState", appState.current);
+  };
+
   const [start, setStart] = useState(false);
   const [stop, setStop] = useState(false);
   const [gameOver, setGameOver] = useState(false);
@@ -87,11 +113,11 @@ export default function App() {
       </View>
       {start && (
         <View>
-          {gameOver && <Text>Game Over</Text>}
+          {gameOver && <Text style={{ fontSize: 36 }}>Game Over</Text>}
           <View style={{ flexDirection: "row" }}>
             <Button
               onPress={stopCounter}
-              title={stop ? "Resume" : "Stop"}
+              title={stop ? "Resume" : "Pause"}
               color="black"
             />
 
