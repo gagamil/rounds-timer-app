@@ -98,18 +98,12 @@ export default function App() {
   return (
     <View style={styles.container}>
       <View styles={styles.counters}>
-        {seconds > 0 && (
-          <>
-            <Text style={styles.activeTimer}>{timeStr}</Text>
-            <Text style={styles.roundCounter}>{count}</Text>
-          </>
-        )}
-        {restSeconds > 0 && (
-          <>
-            <Text style={styles.pauseTimer}>{timeStr}</Text>
-            <Text style={styles.roundCounter}>{count}</Text>
-          </>
-        )}
+        {seconds > 0 && <Text style={styles.activeTimer}>{timeStr}</Text>}
+        {restSeconds > 0 && <Text style={styles.pauseTimer}>{timeStr}</Text>}
+        <View>
+          <Text style={styles.roundCounter}>{count}</Text>
+          <Text style={styles.roundCounterRoundLabel}>Round</Text>
+        </View>
       </View>
       {start && (
         <View>
@@ -149,9 +143,15 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   roundCounter: {
-    fontSize: 48,
+    fontSize: 128,
     textAlign: "center",
     fontVariant: ["tabular-nums"],
+    color: "grey",
+    paddingTop: 16,
+  },
+  roundCounterRoundLabel: {
+    fontSize: 32,
+    textAlign: "center",
     color: "grey",
   },
   activeTimer: {
