@@ -1,7 +1,9 @@
 import { StatusBar } from "expo-status-bar";
 import React, { useRef, useState, useEffect } from "react";
-import { AppState, StyleSheet, Text, View, Button } from "react-native";
+import { AppState, StyleSheet, View } from "react-native";
 import { useKeepAwake } from "expo-keep-awake";
+import Timer from "./components/Timer";
+import ActionBlock from "./components/ActionBlock";
 
 export default function App() {
   useKeepAwake();
@@ -9,14 +11,18 @@ export default function App() {
   const [appStateVisible, setAppStateVisible] = useState(appState.current);
 
   useEffect(() => {
-    AppState.addEventListener("change", _handleAppStateChange);
+    const subscription = AppState.addEventListener(
+      "change",
+      _handleAppStateChange
+    );
 
     return () => {
-      AppState.removeEventListener("change", _handleAppStateChange);
+      subscription.remove();
     };
   }, []);
 
   const _handleAppStateChange = (nextAppState) => {
+    console.log("STATE CHANGE");
     if (
       (appState.current == "active" && nextAppState === "inactive") ||
       "background"
@@ -97,35 +103,20 @@ export default function App() {
 
   return (
     <View style={styles.container}>
-      <View styles={styles.counters}>
-        {seconds > 0 && <Text style={styles.activeTimer}>{timeStr}</Text>}
-        {restSeconds > 0 && <Text style={styles.pauseTimer}>{timeStr}</Text>}
-        <View>
-          <Text style={styles.roundCounter}>{count}</Text>
-          <Text style={styles.roundCounterRoundLabel}>Round</Text>
-        </View>
-      </View>
-      {start && (
-        <View>
-          {gameOver && <Text style={{ fontSize: 36 }}>Game Over</Text>}
-          <View style={{ flexDirection: "row" }}>
-            <Button
-              onPress={stopCounter}
-              title={stop ? "Resume" : "Pause"}
-              color="black"
-            />
-
-            {stop && (
-              <Button onPress={resetRounds} title="Reset" color="black" />
-            )}
-          </View>
-        </View>
-      )}
-      {!start && (
-        <View>
-          <Button onPress={() => setStart(true)} title="Start" color="black" />
-        </View>
-      )}
+      <Timer
+        count={count}
+        timeStr={timeStr}
+        seconds={seconds}
+        restSeconds={restSeconds}
+      />
+      <ActionBlock
+        gameOver={gameOver}
+        stopCounter={stopCounter}
+        resetRounds={resetRounds}
+        setStart={setStart}
+        start={start}
+        stop={stop}
+      />
       <StatusBar style="auto" />
     </View>
   );
@@ -137,31 +128,5 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     alignItems: "center",
     justifyContent: "space-around",
-  },
-  counters: {
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  roundCounter: {
-    fontSize: 128,
-    textAlign: "center",
-    fontVariant: ["tabular-nums"],
-    color: "grey",
-    paddingTop: 16,
-  },
-  roundCounterRoundLabel: {
-    fontSize: 32,
-    textAlign: "center",
-    color: "grey",
-  },
-  activeTimer: {
-    fontSize: 96,
-    textAlign: "center",
-    fontVariant: ["tabular-nums"],
-  },
-  pauseTimer: {
-    fontSize: 96,
-    fontVariant: ["tabular-nums"],
-    color: "red",
   },
 });
