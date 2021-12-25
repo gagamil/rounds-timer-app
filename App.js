@@ -89,7 +89,7 @@ export default function App() {
 
   useEffect(() => {
     if (0 == seconds) {
-      if (count < 12) setRestSeconds(pauseBetweenRounds);
+      if (count < maxRounds) setRestSeconds(pauseBetweenRounds);
       else setGameOver(true);
     }
   }, [seconds]);
