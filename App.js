@@ -40,9 +40,13 @@ export default function App() {
   const [stop, setStop] = useState(false);
   const [gameOver, setGameOver] = useState(false);
   const maxRounds = 12;
+  const preStartWarmupDuration = 15;
   const roudDuration = 180;
   const pauseBetweenRounds = 60;
   const [count, setCount] = useState(1);
+  const [warmUpSecondCount, setWarmUpSecondCount] = useState(
+    preStartWarmupDuration
+  );
   const [seconds, setSeconds] = useState(roudDuration);
   const [restSeconds, setRestSeconds] = useState(0);
   const [timeStr, setTimeStr] = useState("");
@@ -54,6 +58,7 @@ export default function App() {
     setRestSeconds(0);
     setStop(false);
     setStart(false);
+    setWarmUpSecondCount(preStartWarmupDuration);
   };
   const stopCounter = () => {
     setStop((currStop) => !currStop);
@@ -64,6 +69,7 @@ export default function App() {
     pauseBetweenRounds,
     currRoundTime: seconds,
     currPauseTime: restSeconds,
+    wait: warmUpSecondCount > 0,
   });
 
   useEffect(() => {
@@ -71,11 +77,15 @@ export default function App() {
     if (start) {
       const countTimer = setInterval(() => {
         if (!stop) {
-          if (seconds > 0) {
-            setSeconds((prevSeconds) => prevSeconds - 1);
-          }
-          if (restSeconds > 0) {
-            setRestSeconds((prevSeconds) => prevSeconds - 1);
+          if (warmUpSecondCount > 0) {
+            setWarmUpSecondCount((prevSeconds) => prevSeconds - 1);
+          } else {
+            if (seconds > 0) {
+              setSeconds((prevSeconds) => prevSeconds - 1);
+            }
+            if (restSeconds > 0) {
+              setRestSeconds((prevSeconds) => prevSeconds - 1);
+            }
           }
         }
         // every 1000 milliseconds
@@ -85,15 +95,21 @@ export default function App() {
         clearInterval(countTimer);
       };
     }
-  }, [start, stop, seconds, restSeconds]);
+  }, [start, stop, seconds, restSeconds, warmUpSecondCount]);
 
   useEffect(() => {
-    console.log(seconds, restSeconds);
-    const ss = new Date(seconds > 0 ? seconds * 1000 : restSeconds * 1000)
-      .toISOString()
-      .substr(14, 5);
+    console.log(seconds, restSeconds, warmUpSecondCount);
+    let secs = null;
+    if (warmUpSecondCount > 0) {
+      secs = warmUpSecondCount * 1000;
+    } else if (seconds > 0) {
+      secs = seconds * 1000;
+    } else {
+      secs = restSeconds * 1000;
+    }
+    const ss = new Date(secs).toISOString().substr(14, 5);
     setTimeStr(ss);
-  }, [seconds, restSeconds]);
+  }, [seconds, restSeconds, warmUpSecondCount]);
 
   useEffect(() => {
     if (0 == seconds) {
@@ -116,6 +132,7 @@ export default function App() {
         timeStr={timeStr}
         seconds={seconds}
         restSeconds={restSeconds}
+        waitBeforeStartSeconds={warmUpSecondCount}
       />
       <ActionBlock
         gameOver={gameOver}

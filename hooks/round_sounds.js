@@ -6,6 +6,7 @@ const usePlaySounds = ({
   pauseBetweenRounds,
   currRoundTime,
   currPauseTime,
+  wait,
 }) => {
   const [startSound, setStartSound] = React.useState(null);
   const [endSound, setEndSound] = React.useState(null);
@@ -29,7 +30,7 @@ const usePlaySounds = ({
         console.log("E R R O R ==> ", e);
       }
     };
-    if (currRoundTime && roudDuration === currRoundTime) {
+    if (!wait && currRoundTime && roudDuration === currRoundTime) {
       playStartSound();
     }
     const playFinishSound = async () => {
@@ -50,7 +51,7 @@ const usePlaySounds = ({
         console.log("E R R O R ==> ", e);
       }
     };
-    if (currPauseTime && pauseBetweenRounds === currPauseTime) {
+    if (!wait && currPauseTime && pauseBetweenRounds === currPauseTime) {
       playFinishSound();
     }
     // await sound.unloadAsync();
@@ -61,6 +62,7 @@ const usePlaySounds = ({
     currPauseTime,
     startSound,
     endSound,
+    wait,
   ]);
 };
 export default usePlaySounds;
