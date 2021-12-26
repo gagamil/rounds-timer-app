@@ -53,6 +53,7 @@ const usePlaySounds = ({
     if (currPauseTime && pauseBetweenRounds === currPauseTime) {
       playFinishSound();
     }
+    // await sound.unloadAsync();
   }, [
     roudDuration,
     pauseBetweenRounds,
