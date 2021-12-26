@@ -4,6 +4,7 @@ import { AppState, StyleSheet, View } from "react-native";
 import { useKeepAwake } from "expo-keep-awake";
 import Timer from "./components/Timer";
 import ActionBlock from "./components/ActionBlock";
+import usePlaySounds from "./hooks/round_sounds";
 
 export default function App() {
   useKeepAwake();
@@ -57,6 +58,13 @@ export default function App() {
   const stopCounter = () => {
     setStop((currStop) => !currStop);
   };
+
+  usePlaySounds({
+    roudDuration,
+    pauseBetweenRounds,
+    currRoundTime: seconds,
+    currPauseTime: restSeconds,
+  });
 
   useEffect(() => {
     // increment the count by 1
